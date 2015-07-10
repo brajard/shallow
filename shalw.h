@@ -41,8 +41,8 @@ void xdisplay(){
 	int i,j;
 	i=(int)(SZX/2);
 	j=(int)(SZY/2);
-	printf("point:%i,%i, Hfil=% -23.15e @J/@Hfil=% -23.15e\n", i,j,
-			YS_Hfil(0,i,j,0), YG_Hfil(0,i,j,0));
+	printf("point:%i,%i, Hfil(0)=% -23.15e Hfil(%d)==% -23.15e @J/@Hfil=% -23.15e\n ", i,j,
+	       YS_Hfil(0,i,j,0), SZT,YS_Hfil(0,i,j,SZT-1),YG_Hfil(0,i,j,0));
 }
 
 void xgauss(int argc, char *argv[]){

@@ -32,6 +32,6 @@ set_nbiter 10
 
 RUN
 
-savestate Hfil 1 ij 5% A 0 ./HfilA
+#savestate Hfil 1 ij 5% A 0 ./HfilA
 
 #fin
