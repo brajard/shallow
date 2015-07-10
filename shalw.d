@@ -1,14 +1,14 @@
-defval SZX 100
-defval SZY 100
+defval SZX 1024
+defval SZY 1024
 defval SZU 1
-defval SZT 100
-defval SZA 101
+defval SZT 20
+defval SZA 21
 
 hat_name shalw 
 
 //option o_gradtest
 option o_parallel
-option o_m1qn3
+//option o_m1qn3
 
 exec disp_option
 
