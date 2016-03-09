@@ -1,5 +1,6 @@
 //Declaration 
 double dx,dy,dedt,svdedt,pcor,grav,dissip,hmoy,alpha,gb,gmx,gsx,gmy,gsy;
+extern void       Yrazgrad_all();
 
 void xdisplay();
 void appli_start(int argc, char *argv[]){}
@@ -44,6 +45,46 @@ void xdisplay(){
 	printf("point:%i,%i, Hfil(0)=% -23.15e Hfil(%d)==% -23.15e @J/@Hfil=% -23.15e\n ", i,j,
 	       YS_Hfil(0,i,j,0), SZT,YS_Hfil(0,i,j,SZT-1),YG_Hfil(0,i,j,0));
 }
+void savegrad(int argc, char *argv[]) {
+  FILE *fid;
+  fid = fopen(argv[1],"w");
+  int i,j;
+  for (i=0;i<SZX;i++) {
+    for (j=0;j<SZY;j++) {
+      fprintf(fid,"%e ",YG_Hfil(0,i,j,0));
+    }
+    fprintf(fid,"\n");
+  }
+  fclose(fid);
+}
+
+void adjoint() {
+  clock_t begin,end;
+  YREAL time_spent;
+ Yset_modeltime(0);
+    before_it(1);
+    //printf("---forward(i=%d)---\n",i);
+    Yforward(-1, 0);
+    
+    //lobs[i]->val = YS_Hfil(0,lobs[i]->Y,lobs[i]->X,lobs[i]->T);
+    //YS_Hfil(0,lobs[i]->Y,lobs[i]->X,lobs[i]->T)++;
+    //Yobs_insert_data("Hfil",0,lobs[i]->Y,lobs[i]->X,0,lobs[i]->T,lobs[i]->val);
+
+
+
+    Yrazgrad_all();  /* avant fct de cout et backprop : sur tous les pas de temps, raz de tous les gradients de tous les modules */
+    
+    YTotalCost = 0.0;	/* Raz aussi du Cout avant les calculs de cout */
+    
+    begin = time(NULL);
+    Ybackward (-1, 0); // Ybackward (YNBSTEPTIME);/* AD (adjoint):-> d*x =M*(X).dX : Yjac * YG -> Ytbeta */
+    end = time(NULL);
+    time_spent = (double)(end - begin);
+    fprintf(stdout,"backward time : %g\n",time_spent);
+    after_it(1);
+
+}
+
 
 void xgauss(int argc, char *argv[]){
 	gb = atof(argv[1]);

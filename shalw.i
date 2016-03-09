@@ -27,11 +27,11 @@ xgauss 10
 cost lms 0.5
 print_cost ON
 
-setepsi_all 2
-set_nbiter 10
+setepsi_all 0
+set_nbiter 1
+adjoint
 
-RUN
 
 #savestate Hfil 1 ij 5% A 0 ./HfilA
-
+savegrad hgrad.dat
 #fin

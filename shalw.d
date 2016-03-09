@@ -77,5 +77,6 @@ insert_fct arg xivg
 insert_fct     xdisplay
 insert_fct arg xgauss
 insert_fct     xvitgeo
-
+insert_fct arg savegrad
+insert_fct     adjoint
 
