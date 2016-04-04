@@ -1,5 +1,7 @@
-defval SZX 1024
-defval SZY 1024
+defval SZX 128
+defval SZY 128
+ #defval SZX 1024
+#defval SZY 1024
 defval SZU 1
 defval SZT 20
 defval SZA 21

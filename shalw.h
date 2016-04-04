@@ -51,7 +51,7 @@ void savegrad(int argc, char *argv[]) {
   int i,j;
   for (i=0;i<SZX;i++) {
     for (j=0;j<SZY;j++) {
-      fprintf(fid,"%e ",YG_Hfil(0,i,j,0));
+      fprintf(fid,"%22.15e ",YG_Hfil(0,i,j,0));
     }
     fprintf(fid,"\n");
   }
