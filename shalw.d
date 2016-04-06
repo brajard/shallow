@@ -10,6 +10,7 @@ hat_name shalw
 
 //option o_gradtest
 option o_parallel
+option o_cadna
 //option o_m1qn3
 
 exec disp_option

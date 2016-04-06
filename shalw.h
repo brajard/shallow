@@ -42,8 +42,15 @@ void xdisplay(){
 	int i,j;
 	i=(int)(SZX/2);
 	j=(int)(SZY/2);
-	printf("point:%i,%i, Hfil(0)=% -23.15e Hfil(%d)==% -23.15e @J/@Hfil=% -23.15e\n ", i,j,
-	       YS_Hfil(0,i,j,0), SZT,YS_Hfil(0,i,j,SZT-1),YG_Hfil(0,i,j,0));
+#ifndef YO_CADNA
+	double h1 = YS_Hfil(0,i,j,0);
+	double h2 = YS_Hfil(0,i,j,SZT-1);
+	double gg = YG_Hfil(0,i,j,0);
+
+	printf("point:%i,%i, Hfil(0)=% -23.15e Hfil(%d)==% -23.15e @J/@Hfil=% -23.15e\n ", i,j,h1 , SZT,h2,gg);
+#else
+	printf("point:%i,%i, Hfil(0)=%s Hfil(%d)==%s @J/@Hfil=%s\n ", i,j,strp(YS_Hfil(0,i,j,0)) , SZT,strp(YS_Hfil(0,i,j,SZT-1)),strp(YG_Hfil(0,i,j,0)));
+#endif
 }
 void savegrad(int argc, char *argv[]) {
   FILE *fid;
@@ -51,7 +58,11 @@ void savegrad(int argc, char *argv[]) {
   int i,j;
   for (i=0;i<SZX;i++) {
     for (j=0;j<SZY;j++) {
+#ifndef YO_CADNA
       fprintf(fid,"%22.15e ",YG_Hfil(0,i,j,0));
+#else
+      fprintf(fid,"%s ",strp(YG_Hfil(0,i,j,0)));
+#endif
     }
     fprintf(fid,"\n");
   }
@@ -60,7 +71,7 @@ void savegrad(int argc, char *argv[]) {
 
 void adjoint() {
   clock_t begin,end;
-  YREAL time_spent;
+  double time_spent;
  Yset_modeltime(0);
     before_it(1);
     //printf("---forward(i=%d)---\n",i);
