@@ -3,14 +3,14 @@ defval SZY 128
  #defval SZX 1024
 #defval SZY 1024
 defval SZU 1
-defval SZT 20
-defval SZA 21
+defval SZT 500
+defval SZA 501
 
 hat_name shalw 
-
+  
 //option o_gradtest
-option o_parallel
-option o_cadna
+//option o_parallel
+//option o_cadna
 //option o_m1qn3
 
 exec disp_option
@@ -82,4 +82,4 @@ insert_fct arg xgauss
 insert_fct     xvitgeo
 insert_fct arg savegrad
 insert_fct     adjoint
-
+insert_fct     print_normgrad

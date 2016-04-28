@@ -69,6 +69,20 @@ void savegrad(int argc, char *argv[]) {
   fclose(fid);
 }
 
+void print_normgrad() {
+    int i,j;
+    YREAL norm=0;
+    for (i=0;i<SZX;i++)
+      for (j =0;j<SZY;j++)
+	norm+=YG_Hfil(0,i,j,0)*YG_Hfil(0,i,j,0);
+    #ifndef YO_CADNA
+      printf("%22.15e \n",norm);
+#else
+      printf("%s \n",strp(norm));
+#endif
+	}
+
+
 void adjoint() {
   clock_t begin,end;
   double time_spent;
