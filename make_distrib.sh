@@ -17,3 +17,7 @@ cp -vf $YAODIR/yao/include/Project.hpp ${distribdir}/include
 cp -vf $YAODIR/yao/include/Model.hpp ${distribdir}/include
 cp -vf $YAODIR/yao/include/Trajectory.hpp ${distribdir}/include
 cp -vf Makefile ${distribdir}
+
+#sed to modify pragma atomic
+#sed -i 's/#pragma omp critical/#pragma omp atomic/g' Yworkdir/Y2shalw.h
+#sed -i 's/#pragma omp critical/#pragma omp atomic/g' Yworkdir/TrajectoryToce.hpp
