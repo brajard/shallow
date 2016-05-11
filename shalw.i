@@ -35,14 +35,20 @@ outoobs Hfil 1 SZA
 #xgauss 5 125000 12500 125000 12500
 xgauss 10
 cost lms 0.5
-print_cost ON
+print_cost OFF
 
 setepsi_all 0
 set_nbiter 1
+
+#testof 0.02 10 10 8 0
+#testof 2e-6 10 10 1 0
+compute_res
+goto fin
 adjoint
 
 
-savestate Hfil 1 ij 5% A 0 ./HfilA
+#savestate Hfil 1 ij 5% A 0 ./HfilA
 savegrad hgrad.dat
 print_normgrad
-#fin
+goto fin
+fin

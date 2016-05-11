@@ -1,9 +1,12 @@
-//Declaration 
+//Declaration
+#include <sys/time.h>
 double dx,dy,dedt,svdedt,pcor,grav,dissip,hmoy,alpha,gb,gmx,gsx,gmy,gsy;
 extern void       Yrazgrad_all();
 
 void xdisplay();
-void appli_start(int argc, char *argv[]){}
+void appli_start(int argc, char *argv[]){
+  srand(1);
+}
 void before_it(int nit){}
 void cost_function(int pdt){}
 void adjust_target(){}
@@ -37,6 +40,12 @@ short select_io(int indic, char *nmod, int sortie, int iaxe,
 	}
 	return(1);
 }
+
+double my_gettimeofday(){
+  struct timeval tmp_time;
+  gettimeofday(&tmp_time, NULL);
+  return tmp_time.tv_sec + (tmp_time.tv_usec * 1.0e-6L);
+} 
 
 void xdisplay(){
 	int i,j;
@@ -86,8 +95,40 @@ void print_normgrad() {
 #endif
 }
 
+double randn (double mu, double sigma)
+{
+  double U1, U2, W, mult;
+  static double X1, X2;
+  static int call = 0;
+ 
+  if (call == 1)
+    {
+      call = !call;
+      return (mu + sigma * (double) X2);
+    }
+ 
+  do
+    {
+      U1 = -1 + ((double) rand () / RAND_MAX) * 2;
+      U2 = -1 + ((double) rand () / RAND_MAX) * 2;
+      W = pow (U1, 2) + pow (U2, 2);
+    }
+  while (W >= 1 || W == 0);
+ 
+  mult = sqrt ((-2 * log (W)) / W);
+  X1 = U1 * mult;
+  X2 = U2 * mult;
+ 
+  call = !call;
+ 
+  return (mu + sigma * (double) X1);
+}
+
+
+
+
 void adjoint() {
-  clock_t begin,end;
+  double begin,end;
   double time_spent;
  Yset_modeltime(0);
     before_it(1);
@@ -104,10 +145,10 @@ void adjoint() {
     
     YTotalCost = 0.0;	/* Raz aussi du Cout avant les calculs de cout */
     
-    begin = time(NULL);
+    begin = my_gettimeofday();
     Ybackward (-1, 0); // Ybackward (YNBSTEPTIME);/* AD (adjoint):-> d*x =M*(X).dX : Yjac * YG -> Ytbeta */
-    end = time(NULL);
-    time_spent = (double)(end - begin);
+    end = my_gettimeofday();
+    time_spent = end - begin;
     fprintf(stdout,"backward time : %g\n",time_spent);
     after_it(1);
 
@@ -160,3 +201,78 @@ void xivg(int argc,char *argv[]){
 }
 
 
+
+void compute_res() {
+  YREAL pdx = 2e-6;
+  //YREAL pdx = 0.2;
+  YREAL alpha = 10;
+  YREAL fdec = 10;
+  YREAL nbloop = 1;
+
+  int k,i,j;
+   double begin,end;
+  double time_spent;
+  YREAL Jx,Jdx,scal_prod=0;
+  YREAL *X0=new YREAL[SZX*SZY];
+  YREAL *dx=new YREAL[SZX*SZY];
+  YREAL *dJx=new YREAL[SZX*SZY];
+  
+  int iloop=0;
+
+  //Create perturbation
+    k=0;
+    for (i=0;i<SZX;i++)
+      for (j =0;j<SZY;j++) {
+	dx[k] = randn(0,pdx);
+	k++;
+      }
+    
+  adjoint();
+    Jx = YTotalCost;
+    //Copy state in X0 and grad in dJx
+    k=0;    
+    for (i=0;i<SZX;i++)
+      for (j = 0;j<SZY;j++) {
+	X0[k] = YS_Hfil(0,i,j,0);
+	dJx[k] = YG_Hfil(0,i,j,0);
+	k++;
+      }
+    
+
+ //Calculate scalaire product
+    scal_prod=0;
+    begin = my_gettimeofday();
+    //#pragma omp parallel for reduction(+ : scal_prod) schedule(static)
+    for (k=0;k<SZX*SZY;k++)
+      scal_prod+=dx[k]*dJx[k];
+ 
+    end = my_gettimeofday();
+    time_spent = end - begin;
+    fprintf(stdout,"scalar product time : %g\n",time_spent);
+    while (iloop<nbloop) {
+  
+    //Forward perturbation
+    k=0;
+    for (i=0;i<SZX;i++)
+      for (j = 0;j<SZY;j++) {
+	YS_Hfil(0,i,j,0) = X0[k]+alpha*dx[k];
+	k++;
+      }
+    adjoint();
+    
+    Jdx = YTotalCost;
+    
+   
+    
+    //Print summary
+#ifdef YO_CADNA
+    printf("J=%s, Jdx=%s,scal_prod=%s,Res=%s\n",strp(Jx),strp(Jdx),strp(alpha*scal_prod),strp(Jdx-Jx-alpha*scal_prod));
+#else
+    printf("J=%22.15e, Jdx=%22.15e,scal_prod=%22.15e,Res=%22.15e\n",Jx,Jdx,alpha*scal_prod,Jdx-Jx-alpha*scal_prod);
+#endif
+    iloop++;
+    alpha=alpha/fdec;
+  }
+  //free memory
+  delete[] X0; delete[] dx ; delete[]dJx;
+}

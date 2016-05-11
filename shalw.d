@@ -9,8 +9,8 @@ defval SZA 501
 hat_name shalw 
   
 //option o_gradtest
-//option o_parallel
-//option o_cadna
+option o_parallel
+option o_cadna
 //option o_m1qn3
 
 exec disp_option
@@ -83,3 +83,4 @@ insert_fct     xvitgeo
 insert_fct arg savegrad
 insert_fct     adjoint
 insert_fct     print_normgrad
+insert_fct     compute_res
