@@ -1,0 +1,26 @@
+  \documentclass[a4paper,12pt]{article}
+  
+  \usepackage[T1]{fontenc}
+  \usepackage{amsmath,amssymb,amsthm}
+  \usepackage[english,frenchb]{babel}
+  \usepackage{array}
+  \usepackage[utf8]{inputenc}
+\addtolength{\hoffset}{-0.5cm}
+\addtolength{\textwidth}{1cm}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+
+
+
+\begin{document}
+%\begin{comment}
+
+\begin{tabular} {|c|c|c|l|}
+id & short descr & num thr & Resid \\
+\hline
+\input summary.tex
+\end{tabular}
+\end{document}
