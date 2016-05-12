@@ -71,14 +71,18 @@ void savegrad(int argc, char *argv[]) {
 
 void print_normgrad() {
     int i,j;
-    YREAL norm=0;
+    YREAL norml2=0;
+    YREAL norminf = 0;
     for (i=0;i<SZX;i++)
-      for (j =0;j<SZY;j++)
+      for (j =0;j<SZY;j++) {
 	norm+=YG_Hfil(0,i,j,0)*YG_Hfil(0,i,j,0);
+	if (fabs(YG_Hfil(0,i,j,0))>norminf)
+	  norminf = fabs(YG_Hfil(0,i,j,0))
+      }
     #ifndef YO_CADNA
-      printf("%22.15e \n",norm);
+    printf("%22.15e \n%22.15e\n",norml2,norminf);
 #else
-      printf("%s \n",strp(norm));
+    printf("%s \n %s\n",strp(norml2),strp(norminf));
 #endif
 	}
 
