@@ -10,9 +10,10 @@ o_error = False ##to comment atomic/critical pragma
 omp = False ##to compile in omp
 cadna  = False ## to add cadna
 critical = False ## with atomic id false (or critical if true)
+reduc = True ##(false)don't use omp reduction even if omp is activated
 
 try:
-    opts,args = getopt.getopt(sys.argv[1:],"",["rootdir=","target=","error","omp","cadna","critical"])
+    opts,args = getopt.getopt(sys.argv[1:],"",["rootdir=","target=","error","omp","cadna","critical","noreduce"])
 except getopt.GetoptError:
     print "Wrong parameters"
     sys.exit(2)
@@ -30,6 +31,8 @@ for opt,arg in opts:
         cadna = True
     elif opt in ("--critical"):
         critical = True
+    elif opt in ("--noreduce"):
+        reduc = False
 
 opt_yao =' -e '
 
@@ -50,6 +53,14 @@ else:
     sedcmd = "sed -i 's/^option o_parallel/\/\/option o_parallel/g' shalw.d"
 sp.call(sedcmd,shell=True)
 
+#Set the omp reduction in shalw.h
+if omp and reduc:
+    sedcmd2 = "sed -i 's/\/\/#pragma omp/#pragma omp/g' shalw.h"
+else:
+    sedcmd2 = "sed -i 's/^[ \t]*#pragma omp/\/\/#pragma omp/g' shalw.h"
+sp.call(sedcmd2,shell=True)
+
+
 if cadna:
     sedcmd = "sed -i 's/\/\/option o_cadna/option o_cadna/g' shalw.d"
     opt_yao += ' -cadna '
@@ -61,6 +72,7 @@ if cadna:
 else:
     sedcmd = "sed -i 's/^option o_cadna/\/\/option o_cadna/g' shalw.d"
  
+
 
 sp.call(sedcmd,shell=True)
 
@@ -104,7 +116,8 @@ if recompile:
 print 'omp=',omp
 print 'cadna=',cadna
 print 'o_error=',o_error
-
+print 'reduc=',reduc
+print 'critical=',critical
 
 #Warnings:
 if len(warnmess)==0:

@@ -133,8 +133,11 @@ void adjoint() {
  Yset_modeltime(0);
     before_it(1);
     //printf("---forward(i=%d)---\n",i);
+    begin = my_gettimeofday();
     Yforward(-1, 0);
-    
+    end = my_gettimeofday();
+    time_spent = end - begin;
+    fprintf(stdout,"forward time : %g\n",time_spent);
     //lobs[i]->val = YS_Hfil(0,lobs[i]->Y,lobs[i]->X,lobs[i]->T);
     //YS_Hfil(0,lobs[i]->Y,lobs[i]->X,lobs[i]->T)++;
     //Yobs_insert_data("Hfil",0,lobs[i]->Y,lobs[i]->X,0,lobs[i]->T,lobs[i]->val);
@@ -242,7 +245,7 @@ void compute_res() {
  //Calculate scalaire product
     scal_prod=0;
     begin = my_gettimeofday();
-    //#pragma omp parallel for reduction(+ : scal_prod) schedule(static)
+#pragma omp parallel for reduction(+ : scal_prod) schedule(static)
     for (k=0;k<SZX*SZY;k++)
       scal_prod+=dx[k]*dJx[k];
  
@@ -266,9 +269,9 @@ void compute_res() {
     
     //Print summary
 #ifdef YO_CADNA
-    printf("J=%s, Jdx=%s,scal_prod=%s,Res=%s\n",strp(Jx),strp(Jdx),strp(alpha*scal_prod),strp(Jdx-Jx-alpha*scal_prod));
+    printf("J=%s, Jdx=%s,scal_prod=%s, Res= %s\n",strp(Jx),strp(Jdx),strp(alpha*scal_prod),strp(Jdx-Jx-alpha*scal_prod));
 #else
-    printf("J=%22.15e, Jdx=%22.15e,scal_prod=%22.15e,Res=%22.15e\n",Jx,Jdx,alpha*scal_prod,Jdx-Jx-alpha*scal_prod);
+    printf("J=%22.15e, Jdx=%22.15e,scal_prod=%22.15e, Res= %22.15e\n",Jx,Jdx,alpha*scal_prod,Jdx-Jx-alpha*scal_prod);
 #endif
     iloop++;
     alpha=alpha/fdec;
